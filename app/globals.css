@@ -1,0 +1,49 @@
+:root {
+  --bg: oklch(97% 0.012 75);
+  --surface: oklch(99% 0.006 75);
+  --ink: oklch(24% 0.02 40);
+  --ink-soft: oklch(48% 0.02 45);
+  --ink-faint: oklch(64% 0.015 50);
+  --line: oklch(90% 0.014 70);
+  --accent: oklch(58% 0.15 35);
+  --accent-dark: oklch(46% 0.15 33);
+  --accent-tint: oklch(93% 0.03 40);
+  --sage: oklch(58% 0.08 150);
+  --sage-dark: oklch(45% 0.08 150);
+  --sage-tint: oklch(93% 0.025 145);
+  --instacart: oklch(62% 0.19 141);
+  --instacart-dark: oklch(50% 0.19 141);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--accent-dark);
+}
+
+.display {
+  font-family: "Newsreader", Georgia, serif;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
