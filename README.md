@@ -2,9 +2,9 @@
 
 A small weekly dinner-planning app: it suggests six quick dinner ideas for
 a family of four, you pick a few, it writes out the full recipes as
-easy-to-follow cards, and turns the combined ingredients into a one-click
-Instacart shopping link. Selected recipes are logged to a Google Sheet so
-future weeks avoid repeats.
+easy-to-follow cards, and lists out the combined ingredients with a
+one-tap Instacart search link on each one. Selected recipes are logged to
+a Google Sheet so future weeks avoid repeats.
 
 ## How it works
 
@@ -13,8 +13,8 @@ future weeks avoid repeats.
 2. You select a few and hit **View recipes** &rarr; `POST /api/recipes`
    asks Claude to expand each into a full recipe (ingredients + steps).
 3. At the last recipe, **Get shopping list** &rarr; `POST /api/shopping-list`
-   combines every ingredient, sends it to Instacart's API for a shoppable
-   link, and logs the week's picks to your history sheet.
+   logs the week's picks to your history sheet and shows every ingredient
+   with a link to Instacart's product search for it.
 
 ## Environment variables
 
@@ -31,27 +31,17 @@ A Claude API key, separate from your claude.ai login:
 
 `ANTHROPIC_MODEL` is optional and defaults to a current Sonnet model; override it if you'd like to try a different one.
 
-### 2. `INSTACART_API_KEY` (required for the shopping link)
+### 2. Instacart (no key needed)
 
-Instacart's Developer Platform is the official way to generate a real,
-shoppable link.
-
-1. Apply at [instacart.com/company/business/developers](https://www.instacart.com/company/business/developers).
-2. Once you have a Developer Dashboard account, go to **API Keys** &rarr;
-   **Create New API Key**, and choose **Development** to start (works
-   immediately, good for testing).
-3. **Important:** Instacart's own docs say production key access (the
-   kind that works for your actual live cart, for any retailer) currently
-   takes roughly 30&ndash;40 days after you request it, since it goes
-   through their approval/demo process. A development key lets you build
-   and test the flow well before that finishes &mdash; just don't expect
-   the "Open in Instacart" button to work against a real cart until the
-   production key comes through.
-4. Paste the key in as `INSTACART_API_KEY`.
-
-If you'd rather skip this wait entirely, say the word and I can swap the
-shopping-list screen for a simpler fallback (per-ingredient Instacart
-search links, or a plain copyable list) while you wait on approval.
+Instacart's Developer Platform &mdash; the official way to generate one
+shoppable cart link for a whole recipe &mdash; is closed to new developer
+applications, with no waitlist. So instead, each ingredient on the
+shopping-list screen links to a plain Instacart product search
+(`instacart.com/store/s?k=...`) for that item: one tap per ingredient
+instead of one link for the whole list, but it needs no account, key, or
+approval. See `lib/instacart.js` for the link-building logic. If Instacart
+ever reopens developer applications and you'd like the single-cart-link
+version back, the original implementation is in this repo's git history.
 
 ### 3. Google Sheets history log (optional, but recommended)
 
@@ -101,6 +91,3 @@ Open [http://localhost:3000](http://localhost:3000).
 
 - Servings are fixed at 4 throughout; change the `servings` values in
   `lib/anthropic.js` and `app/page.js` if that ever changes.
-- The Instacart integration was built from Instacart's published API
-  docs; once you have a real key, it's worth a quick test run to confirm
-  the request/response shapes still match &mdash; their API can evolve.

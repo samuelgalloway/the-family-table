@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { buildInstacartSearchUrl } from "../lib/instacart";
 
 const PLATE_ICON = (
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -62,7 +63,6 @@ export default function Home() {
   const [recipes, setRecipes] = useState([]);
   const [loadingRecipes, setLoadingRecipes] = useState(false);
   const [recipeIndex, setRecipeIndex] = useState(0);
-  const [instacartUrl, setInstacartUrl] = useState(null);
   const [loadingCart, setLoadingCart] = useState(false);
   const [error, setError] = useState(null);
 
@@ -122,8 +122,7 @@ export default function Home() {
         body: JSON.stringify({ recipes: recipes.map((r, i) => ({ ...r, tag: selectedIdeas[i]?.tag })) }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Could not build shopping list");
-      setInstacartUrl(data.instacartUrl);
+      if (!res.ok) throw new Error(data.error || "Could not save shopping list");
       setView("cart");
     } catch (err) {
       setError(err.message);
@@ -136,7 +135,6 @@ export default function Home() {
     setSelected({});
     setRecipes([]);
     setRecipeIndex(0);
-    setInstacartUrl(null);
     setView("ideas");
     loadIdeas();
   }
@@ -329,7 +327,7 @@ export default function Home() {
                   Shopping list
                 </div>
                 <div style={{ fontSize: 13, color: "var(--ink-soft)", lineHeight: 1.5 }}>
-                  {recipes.reduce((n, r) => n + r.ingredients.length, 0)} ingredients across {recipes.length} recipes.
+                  {recipes.reduce((n, r) => n + r.ingredients.length, 0)} ingredients across {recipes.length} recipes. Tap one to search it on Instacart.
                 </div>
               </div>
 
@@ -339,10 +337,17 @@ export default function Home() {
                     <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10 }}>{recipe.title}</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                       {recipe.ingredients.map((ing, j) => (
-                        <div key={j} style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 13.5, color: "var(--ink-soft)" }}>
-                          <div style={{ width: 5, height: 5, borderRadius: 999, background: "var(--sage)" }} />
-                          {ing}
-                        </div>
+                        <a
+                          key={j}
+                          href={buildInstacartSearchUrl(ing)}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 13.5, color: "var(--ink-soft)" }}
+                        >
+                          <div style={{ width: 5, height: 5, borderRadius: 999, background: "var(--sage)", flexShrink: 0 }} />
+                          <span style={{ flexGrow: 1 }}>{ing}</span>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--instacart-dark)", flexShrink: 0 }}>Shop &rarr;</span>
+                        </a>
                       ))}
                     </div>
                   </div>
@@ -351,30 +356,9 @@ export default function Home() {
             </div>
 
             <div style={{ position: "sticky", bottom: 0, padding: "14px 20px", background: "var(--surface)", borderTop: "1px solid var(--line)", display: "flex", flexDirection: "column", gap: 10 }}>
-              <div style={{ display: "flex", gap: 10 }}>
-                <button onClick={() => setView("recipe")} style={{ background: "var(--bg)", color: "var(--ink-soft)", border: "1px solid var(--line)", padding: "12px 16px", borderRadius: 10, fontSize: 14, fontWeight: 600 }}>
-                  Back
-                </button>
-                <a
-                  href={instacartUrl || "#"}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    flexGrow: 1,
-                    background: instacartUrl ? "var(--instacart)" : "var(--line)",
-                    color: instacartUrl ? "white" : "var(--ink-faint)",
-                    border: "none",
-                    padding: "12px 16px",
-                    borderRadius: 10,
-                    fontSize: 14,
-                    fontWeight: 700,
-                    textAlign: "center",
-                    pointerEvents: instacartUrl ? "auto" : "none",
-                  }}
-                >
-                  Open in Instacart
-                </a>
-              </div>
+              <button onClick={() => setView("recipe")} style={{ background: "var(--bg)", color: "var(--ink-soft)", border: "1px solid var(--line)", padding: "12px 16px", borderRadius: 10, fontSize: 14, fontWeight: 600 }}>
+                Back
+              </button>
               <button onClick={startOver} style={{ background: "none", border: "none", padding: 4, fontSize: 12.5, color: "var(--ink-faint)", fontWeight: 500, textDecoration: "underline" }}>
                 Start a new week
               </button>
