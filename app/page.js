@@ -63,6 +63,7 @@ export default function Home() {
   const [recipes, setRecipes] = useState([]);
   const [loadingRecipes, setLoadingRecipes] = useState(false);
   const [recipeIndex, setRecipeIndex] = useState(0);
+  const [categories, setCategories] = useState([]);
   const [loadingCart, setLoadingCart] = useState(false);
   const [error, setError] = useState(null);
 
@@ -122,7 +123,8 @@ export default function Home() {
         body: JSON.stringify({ recipes: recipes.map((r, i) => ({ ...r, tag: selectedIdeas[i]?.tag })) }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Could not save shopping list");
+      if (!res.ok) throw new Error(data.error || "Could not build shopping list");
+      setCategories(data.categories);
       setView("cart");
     } catch (err) {
       setError(err.message);
@@ -135,6 +137,7 @@ export default function Home() {
     setSelected({});
     setRecipes([]);
     setRecipeIndex(0);
+    setCategories([]);
     setView("ideas");
     loadIdeas();
   }
@@ -327,16 +330,18 @@ export default function Home() {
                   Shopping list
                 </div>
                 <div style={{ fontSize: 13, color: "var(--ink-soft)", lineHeight: 1.5 }}>
-                  {recipes.reduce((n, r) => n + r.ingredients.length, 0)} ingredients across {recipes.length} recipes. Tap one to search it on Instacart.
+                  {categories.reduce((n, c) => n + c.items.length, 0)} items to buy, combined across {recipes.length} recipes. Tap one to search it on Instacart.
                 </div>
               </div>
 
               <div style={{ padding: "8px 20px 24px", display: "flex", flexDirection: "column", gap: 18 }}>
-                {recipes.map((recipe, i) => (
+                {categories.map((category, i) => (
                   <div key={i} style={{ background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 14, padding: "14px 16px" }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10 }}>{recipe.title}</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-faint)", marginBottom: 10 }}>
+                      {category.name}
+                    </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                      {recipe.ingredients.map((ing, j) => (
+                      {category.items.map((ing, j) => (
                         <a
                           key={j}
                           href={buildInstacartSearchUrl(ing)}

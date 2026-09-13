@@ -2,9 +2,11 @@
 
 A small weekly dinner-planning app: it suggests six quick dinner ideas for
 a family of four, you pick a few, it writes out the full recipes as
-easy-to-follow cards, and lists out the combined ingredients with a
-one-tap Instacart search link on each one. Selected recipes are logged to
-a Google Sheet so future weeks avoid repeats.
+easy-to-follow cards, and combines every recipe's ingredients into one
+deduplicated, categorized shopping list &mdash; skipping pantry staples
+you always have on hand &mdash; with a one-tap Instacart search link on
+each item. Selected recipes are logged to a Google Sheet so future weeks
+avoid repeats.
 
 ## How it works
 
@@ -13,8 +15,12 @@ a Google Sheet so future weeks avoid repeats.
 2. You select a few and hit **View recipes** &rarr; `POST /api/recipes`
    asks Claude to expand each into a full recipe (ingredients + steps).
 3. At the last recipe, **Get shopping list** &rarr; `POST /api/shopping-list`
-   logs the week's picks to your history sheet and shows every ingredient
-   with a link to Instacart's product search for it.
+   asks Claude to merge every recipe's ingredients into one list (e.g.
+   three recipes each calling for olive oil become a single line),
+   grouped into categories (Proteins, Produce, Dairy & Eggs, etc.) and
+   with pantry staples left out entirely. It also logs the week's picks to
+   your history sheet. Each item links to Instacart's product search for
+   it.
 
 ## Environment variables
 
@@ -30,6 +36,13 @@ A Claude API key, separate from your claude.ai login:
 3. Paste it in as `ANTHROPIC_API_KEY`. You'll be billed per API call (this app's usage is tiny &mdash; a few cents a week at most).
 
 `ANTHROPIC_MODEL` is optional and defaults to a current Sonnet model; override it if you'd like to try a different one.
+
+`PANTRY_STAPLES` is optional &mdash; a comma-separated list of ingredients
+to always leave off the shopping list (things you assume you already
+have). Defaults to a sensible list (olive oil, salt, pepper, butter,
+sugar, flour, garlic/onion powder, water, etc. &mdash; see
+`DEFAULT_PANTRY_STAPLES` in `lib/anthropic.js`). Set your own to override
+it entirely, e.g. `PANTRY_STAPLES=olive oil,salt,pepper,butter,soy sauce`.
 
 ### 2. Instacart (no key needed)
 
