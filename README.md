@@ -2,18 +2,22 @@
 
 A small weekly dinner-planning app: it suggests six quick dinner ideas for
 a family of four, you pick a few, it writes out the full recipes as
-easy-to-follow cards, and combines every recipe's ingredients into one
-deduplicated, categorized shopping list &mdash; skipping pantry staples
-you always have on hand &mdash; with a one-tap Instacart search link on
-each item. Selected recipes are logged to a Google Sheet so future weeks
-avoid repeats.
+easy-to-follow cards (each with a real food photo, and a **Save as PDF**
+button to print or share the card), and combines every recipe's
+ingredients into one deduplicated, categorized shopping list &mdash;
+skipping pantry staples you always have on hand &mdash; with a one-tap
+Instacart search link on each item. Selected recipes are logged to a
+Google Sheet so future weeks avoid repeats.
 
 ## How it works
 
 1. `GET /api/ideas` asks Claude for 6 dinner ideas (checking your recent
    history sheet first, so it doesn't repeat last week's dinners).
 2. You select a few and hit **View recipes** &rarr; `POST /api/recipes`
-   asks Claude to expand each into a full recipe (ingredients + steps).
+   asks Claude to expand each into a full recipe (ingredients + steps),
+   and looks up a matching photo for each on Pexels. Each recipe card has
+   a **Save as PDF** button (uses the browser's print-to-PDF, so it needs
+   no extra dependency) for printing or sharing that one recipe.
 3. At the last recipe, **Get shopping list** &rarr; `POST /api/shopping-list`
    asks Claude to merge every recipe's ingredients into one list (e.g.
    three recipes each calling for olive oil become a single line),
@@ -40,7 +44,8 @@ A Claude API key, separate from your claude.ai login:
 `PANTRY_STAPLES` is optional &mdash; a comma-separated list of ingredients
 to always leave off the shopping list (things you assume you already
 have). Defaults to a sensible list (olive oil, salt, pepper, butter,
-sugar, flour, garlic/onion powder, water, etc. &mdash; see
+sugar, flour, garlic, garlic/onion powder, cumin, chili powder, water,
+etc. &mdash; see
 `DEFAULT_PANTRY_STAPLES` in `lib/anthropic.js`). Set your own to override
 it entirely, e.g. `PANTRY_STAPLES=olive oil,salt,pepper,butter,soy sauce`.
 
@@ -56,7 +61,21 @@ approval. See `lib/instacart.js` for the link-building logic. If Instacart
 ever reopens developer applications and you'd like the single-cart-link
 version back, the original implementation is in this repo's git history.
 
-### 3. Google Sheets history log (optional, but recommended)
+### 3. `PEXELS_API_KEY` (optional, for recipe photos)
+
+Pexels provides free stock photos with an instant, self-serve API &mdash;
+no approval wait like Instacart's.
+
+1. Go to [pexels.com/api](https://www.pexels.com/api/) and sign up (free).
+2. Your API key is shown right away on your account page &mdash; no
+   application review.
+3. Paste it in as `PEXELS_API_KEY`. Pexels' free tier (200 requests/hour,
+   20,000/month) is far more than this app needs.
+
+Without this set, recipe cards just show a generic plate icon instead of
+a photo &mdash; everything else still works.
+
+### 4. Google Sheets history log (optional, but recommended)
 
 1. In the [Google Cloud Console](https://console.cloud.google.com), create
    a project (or use an existing one) and enable the **Google Sheets API**.

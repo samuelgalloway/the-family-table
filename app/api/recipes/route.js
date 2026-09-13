@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import { generateFullRecipe } from "../../../lib/anthropic";
+import { findFoodPhoto } from "../../../lib/pexels";
 
 // Body: { ideas: [{ id, title, tagline }, ...] }
-// Expands each selected idea into a full recipe, in parallel.
+// Expands each selected idea into a full recipe, in parallel, and attaches
+// a matching food photo (photo is null if PEXELS_API_KEY isn't set or
+// nothing matched — the recipe still comes back fine either way).
 export async function POST(request) {
   try {
     const { ideas } = await request.json();
@@ -11,7 +14,13 @@ export async function POST(request) {
     }
 
     const recipes = await Promise.all(
-      ideas.map((idea) => generateFullRecipe({ ...idea, servings: 4 }))
+      ideas.map(async (idea) => {
+        const [recipe, photo] = await Promise.all([
+          generateFullRecipe({ ...idea, servings: 4 }),
+          findFoodPhoto(idea.title),
+        ]);
+        return { ...recipe, photo };
+      })
     );
 
     return NextResponse.json({ recipes });

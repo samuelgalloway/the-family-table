@@ -47,3 +47,15 @@ button {
 button:disabled {
   cursor: not-allowed;
 }
+
+/* Used on chrome (header, nav, buttons) that shouldn't appear when a
+   recipe is printed / saved as a PDF via the "Save as PDF" button. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  html,
+  body {
+    background: white;
+  }
+}

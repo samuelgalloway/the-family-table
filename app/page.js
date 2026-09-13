@@ -149,7 +149,7 @@ export default function Home() {
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
       <div style={{ maxWidth: 480, margin: "0 auto", width: "100%", flexGrow: 1, display: "flex", flexDirection: "column" }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 14, padding: "22px 20px 16px", background: "var(--surface)", borderBottom: "1px solid var(--line)" }}>
+        <div className="no-print" style={{ display: "flex", flexDirection: "column", gap: 14, padding: "22px 20px 16px", background: "var(--surface)", borderBottom: "1px solid var(--line)" }}>
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
             <div className="display" style={{ fontSize: 22, fontWeight: 600, letterSpacing: "-0.01em" }}>
               The Family Table
@@ -160,7 +160,7 @@ export default function Home() {
         </div>
 
         {error && (
-          <div style={{ margin: "16px 20px 0", padding: "12px 14px", background: "var(--accent-tint)", color: "var(--accent-dark)", borderRadius: 10, fontSize: 13 }}>
+          <div className="no-print" style={{ margin: "16px 20px 0", padding: "12px 14px", background: "var(--accent-tint)", color: "var(--accent-dark)", borderRadius: 10, fontSize: 13 }}>
             {error}
           </div>
         )}
@@ -246,22 +246,49 @@ export default function Home() {
         {view === "recipe" && currentRecipe && (
           <>
             <div style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px 4px" }}>
+              <div className="no-print" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px 4px" }}>
                 <button onClick={() => setView("ideas")} style={{ background: "none", border: "none", padding: "6px 0", fontSize: 13, fontWeight: 500, color: "var(--ink-soft)" }}>
                   &larr; Ideas
                 </button>
-                <div style={{ fontSize: 12, color: "var(--ink-faint)", fontWeight: 500 }}>
-                  Recipe {recipeIndex + 1} of {recipes.length}
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ fontSize: 12, color: "var(--ink-faint)", fontWeight: 500 }}>
+                    Recipe {recipeIndex + 1} of {recipes.length}
+                  </div>
+                  <button
+                    onClick={() => window.print()}
+                    style={{ background: "var(--accent-tint)", color: "var(--accent-dark)", border: "none", padding: "6px 10px", borderRadius: 8, fontSize: 11.5, fontWeight: 600 }}
+                  >
+                    Save as PDF
+                  </button>
                 </div>
               </div>
 
               <div style={{ padding: "8px 20px 24px" }}>
-                <div style={{ height: 150, borderRadius: 16, background: palette(recipeIndex).tint, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16, color: palette(recipeIndex).color }}>
-                  <svg width="52" height="52" viewBox="0 0 24 24" fill="none" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="14" r="7" />
-                    <path d="M8 3.5c.6 1.4.2 2.4-.6 3.2M12 2.8c.2 1.5-.3 2.6-1.2 3.4M16 3.5c-.6 1.4-.2 2.4.6 3.2" />
-                  </svg>
-                </div>
+                {currentRecipe.photo ? (
+                  <div style={{ position: "relative", marginBottom: 16 }}>
+                    <img
+                      src={currentRecipe.photo.url}
+                      alt={currentRecipe.photo.alt}
+                      style={{ width: "100%", height: 180, objectFit: "cover", borderRadius: 16, display: "block" }}
+                    />
+                    <a
+                      href={currentRecipe.photo.photographerUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="no-print"
+                      style={{ position: "absolute", bottom: 8, right: 8, fontSize: 10, color: "white", background: "oklch(20% 0 0 / 0.5)", padding: "3px 7px", borderRadius: 6 }}
+                    >
+                      Photo: {currentRecipe.photo.photographer} / Pexels
+                    </a>
+                  </div>
+                ) : (
+                  <div style={{ height: 150, borderRadius: 16, background: palette(recipeIndex).tint, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16, color: palette(recipeIndex).color }}>
+                    <svg width="52" height="52" viewBox="0 0 24 24" fill="none" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="14" r="7" />
+                      <path d="M8 3.5c.6 1.4.2 2.4-.6 3.2M12 2.8c.2 1.5-.3 2.6-1.2 3.4M16 3.5c-.6 1.4-.2 2.4.6 3.2" />
+                    </svg>
+                  </div>
+                )}
 
                 <div className="display" style={{ fontSize: 22, fontWeight: 600, marginBottom: 6, lineHeight: 1.2 }}>
                   {currentRecipe.title}
@@ -303,7 +330,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div style={{ position: "sticky", bottom: 0, padding: "14px 20px", background: "var(--surface)", borderTop: "1px solid var(--line)", display: "flex", gap: 10 }}>
+            <div className="no-print" style={{ position: "sticky", bottom: 0, padding: "14px 20px", background: "var(--surface)", borderTop: "1px solid var(--line)", display: "flex", gap: 10 }}>
               <button
                 onClick={() => setRecipeIndex((i) => Math.max(0, i - 1))}
                 disabled={isFirst}
